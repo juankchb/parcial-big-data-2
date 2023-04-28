@@ -1,20 +1,24 @@
-import boto3
 import requests
-import datetime
+from datetime import datetime
+import boto3
 
-client = boto3.client('s3')
-BUCKET_NAME = 'headlines-scrapc'
-
-
-def capturar_html():
-    url = 'https://www.eltiempo.com'
-    url2 = 'https://www.elespectador.com'
+def f(url, header):
+    bucket = 'headlines-scrapc'
     response = requests.get(url)
-    response2 = requests.get(url2)
-    html_file = f"{datetime.datetime.now().strftime('%Y-%m-%d')}.html"
-    html_file2 = f"Es{datetime.datetime.now().strftime('%Y-%m-%d')}.html"
-    client.put_object(Bucket=BUCKET_NAME, Key='raw/'+html_file, Body=response.content)
-    client.put_object(Bucket=BUCKET_NAME, Key='raw/'+html_file2, Body=response2.content)
+    html_url = response.content
+
+    s3 = boto3.resource('s3')
+    dt = datetime.now()
+    date = dt.strftime('%Y-%m-%d')
     
-    
-capturar_html()
+    file_name = f'{header}/contenido-{date}.html'
+
+    s3.Bucket(bucket).put_object(
+        Key=file_name,
+        Body=html_url
+        )
+        
+    return print("Contenido guardado - " + file_name)
+
+f('https://www.eltiempo.com/', 'tiempo')
+f('https://www.elespectador.com/', 'espectador')
