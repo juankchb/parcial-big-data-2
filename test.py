@@ -1,4 +1,3 @@
-import ray
 import boto3
 import requests
 import datetime
